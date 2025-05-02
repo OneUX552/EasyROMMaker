@@ -51,9 +51,35 @@ else
     echo "[+] All dependencies are already installed. Skipping installation."
 fi
 
+
+download_res() {
+    local URL="https://get.filesto.space/download/gAAAAABoFKLvlxKH4X-KFhzcOHgHol29SVqvi7_DbMrWnDFNMMTLEawA17ZAYyI9wQntAiGUQOm1OlOPIFnACMMR1BlDkNIgSsm-xBgNRVya2N7fc-5iOAMYQEQuTkHbW3HkE3o7X05w"
+    local FILE_NAME="file.7z"
+    local DEST_DIR="resources/"
+    local MIN_SIZE_MB=600
+
+    # Check if file exists and verify its size (600MB or more)
+    if [[ -f "$FILE_NAME" ]]; then
+        local FILE_SIZE_MB=$(( $(stat -c%s "$FILE_NAME") / 1024 / 1024 ))
+        if (( FILE_SIZE_MB >= MIN_SIZE_MB )); then
+            echo "File already exists and is 600MB+, skipping download."
+            return 0
+        fi
+    fi
+
+    echo "Downloading resources required for patching ROM..."
+    curl -L "$URL" -o "$FILE_NAME"
+
+    echo "Extracting contents to: $DEST_DIR"
+    mkdir -p "$DEST_DIR"
+    7z x "$FILE_NAME" -o"$DEST_DIR"
+
+    echo "Download and extraction completed."
+}
+
+
+
 # CRB Environment Setup
-
-
 setup_crb_environment() {
     # Load CRB path from config
     if [ ! -f "${BASE_DIR}/conf.txt" ]; then
@@ -189,6 +215,8 @@ update_filesystem_sizes() {
     
     echo -e "${GREEN}[✓] Filesystem adjustments completed${NC}"
 }
+
+download_res
 
 # Call the CRB setup function
 setup_crb_environment
