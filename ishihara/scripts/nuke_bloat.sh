@@ -121,6 +121,11 @@ declare -a BLOAT_LIST=(
 	"system/system/priv-app/AirCommand"
 	"system/system/app/SamsungTTSVoice_es_US_l01"
 	"system/system/app/BlockchainBasicKit"
+ "system/system/priv-app/SmartEye"
+ "system/system/priv-app/UnifiedTetheringProvision"
+ "system/system/priv-app/UnifiedVVM"
+ "system/system/priv-app/PhotoEditor_Full"
+ "system/system/priv-app/AirReadingGlass'
 
   "product/app/AssistantShell"
   "product/app/Chrome"
