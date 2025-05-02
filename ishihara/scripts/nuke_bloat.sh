@@ -127,6 +127,7 @@ declare -a BLOAT_LIST=(
  "system/system/priv-app/PhotoEditor_Full"
  "system/system/priv-app/AirReadingGlass'
 
+
   "product/app/AssistantShell"
   "product/app/Chrome"
   "product/app/DuoStub"
@@ -136,6 +137,11 @@ declare -a BLOAT_LIST=(
   "product/overlay/GmsConfigOverlaySearchSelector.apk"
   "product/priv-app/Messages"
   "product/priv-app/SearchSelector"
+
+"system/system/bin/fabric_crypto"
+"system/system/etc/init/fabric_crypto.rc"
+
+  
 )
 
 # ================================================
