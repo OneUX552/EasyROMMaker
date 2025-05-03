@@ -18,10 +18,11 @@
 ## 🛠️ Build Instructions
 
 ### 1. Initial Setup
-```bash
+
 git clone https://github.com/ishihara0xn/Ishihara0xn-ROM
 cd Ishihara0xn-ROM
-2. Configuration
+
+### 2. Configuration
 Edit conf.txt with your parameters:
 
 
