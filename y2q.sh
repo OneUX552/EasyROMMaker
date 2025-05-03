@@ -15,8 +15,8 @@ NC='\033[0m'
 
 echo "Hello World"
 
-device="x1q"
-model="Galaxy S20 5G"
+device="y2q"
+model="Galaxy S20+ 5G"
 cpu="Snapdragon 865 kona/SD 8250"
 
 echo "ishiharaROM for $device $model"
