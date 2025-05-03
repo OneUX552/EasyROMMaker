@@ -54,9 +54,9 @@ fi
 
 download_res() {
     local URL="https://get.filesto.space/download/gAAAAABoFKLvlxKH4X-KFhzcOHgHol29SVqvi7_DbMrWnDFNMMTLEawA17ZAYyI9wQntAiGUQOm1OlOPIFnACMMR1BlDkNIgSsm-xBgNRVya2N7fc-5iOAMYQEQuTkHbW3HkE3o7X05w"
-    local FILE_NAME="file.7z"
+    local FILE_NAME="resources.7z"
     local DEST_DIR="resources/"
-    local MIN_SIZE_MB=600
+    local MIN_SIZE_MB=300
 
     # Check if file exists and verify its size (600MB or more)
     if [[ -f "$FILE_NAME" ]]; then
@@ -230,6 +230,69 @@ fi
 
 source "${HELPER_SCRIPT}"
 
+run_device_scripts() {
+    local device_scripts_dir="${BASE_DIR}/devices/${device}/scripts"
+    
+    # Check if device scripts directory exists
+    if [ ! -d "${device_scripts_dir}" ]; then
+        echo -e "${YELLOW}[!] No device scripts directory found at ${device_scripts_dir}${NC}"
+        return 0
+    fi
+
+    # Initialize counters
+    local DEVICE_TOTAL=0
+    local DEVICE_SUCCESS=0
+    local DEVICE_FAILED=0
+    local device_failed_scripts=()
+
+    echo -e "\n${YELLOW}[+] Locating device-specific scripts for ${device}...${NC}"
+    shopt -s nullglob
+    local device_scripts=("${device_scripts_dir}"/*.sh)
+    DEVICE_TOTAL=${#device_scripts[@]}
+
+    if [ ${DEVICE_TOTAL} -eq 0 ]; then
+        echo -e "${YELLOW}[!] No device scripts found in ${device_scripts_dir}${NC}"
+        return 0
+    fi
+
+    # Sort device scripts
+    local IFS=$'\n'
+    local sorted_device_scripts=($(sort -V <<< "${device_scripts[*]}"))
+    unset IFS
+
+    echo -e "${GREEN}[+] Found ${DEVICE_TOTAL} device-specific scripts${NC}"
+    
+    for script in "${sorted_device_scripts[@]}"; do
+        echo -e "${GREEN}==================================================${NC}"
+        echo -e "${GREEN}[+] Executing DEVICE SCRIPT: $(basename "${script}")${NC}"
+        echo -e "${GREEN}==================================================${NC}"
+        
+        [ ! -x "${script}" ] && chmod +x "${script}"
+        
+        if (
+            cd "${ROM_FOLDER}" && \
+            "${script}"
+        ); then
+            ((DEVICE_SUCCESS++))
+            echo -e "${GREEN}[✓] Device script success: $(basename "${script}")${NC}\n"
+        else
+            ((DEVICE_FAILED++))
+            device_failed_scripts+=("$(basename "${script}")")
+            echo -e "${RED}[✗] Device script failed: $(basename "${script}")${NC}\n"
+        fi
+    done
+
+    # Update main counters
+    TOTAL_SCRIPTS=$((TOTAL_SCRIPTS + DEVICE_TOTAL))
+    SUCCESS_SCRIPTS=$((SUCCESS_SCRIPTS + DEVICE_SUCCESS))
+    FAILED_SCRIPTS=$((FAILED_SCRIPTS + DEVICE_FAILED))
+    failed_scripts+=("${device_failed_scripts[@]}")
+
+    echo -e "${GREEN}[✓] Device script execution completed (${DEVICE_SUCCESS}/${DEVICE_TOTAL} succeeded)${NC}"
+}
+
+
+
 # Initialize counters
 TOTAL_SCRIPTS=0
 SUCCESS_SCRIPTS=0
@@ -276,10 +339,13 @@ for script in "${sorted_scripts[@]}"; do
     fi
 done
 
+run_device_scripts
+
 # Print summary
 echo -e "${GREEN}================== PROCESSING SUMMARY ==================${NC}"
 echo -e "ROM Directory:    ${ROM_FOLDER}"
 echo -e "Total Scripts:    ${TOTAL_SCRIPTS}"
+echo -e "Device Scripts:   ${BASE_DIR}/devices/${device}/scripts"
 echo -e "${GREEN}Successful:      ${SUCCESS_SCRIPTS}${NC}"
 echo -e "${RED}Failed:          ${FAILED_SCRIPTS}${NC}"
 
@@ -293,6 +359,7 @@ if [ ${FAILED_SCRIPTS} -gt 0 ]; then
 fi
 
 echo -e "${GREEN}[+] Initial setup completed!${NC}"
+
 
 
 update_filesystem_sizes
