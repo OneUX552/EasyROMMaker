@@ -1,7 +1,7 @@
 # Ishihara0xn-ROM v6.1.1
 
 ![IshiharaROM Banner](https://i.imgur.com/placeholder.png)  
-*A full Samsung firmware port for Galaxy S20/S20+ series with enhanced features and customization*
+*A full Samsung firmware port for Galaxy S20/S20+/Ultra and Note20 series with enhanced features and customization*
 
 ## 📌 Key Features
 - Based on latest Samsung OneUI firmware
@@ -11,6 +11,7 @@
 
 ## ⚠️ Requirements
 - **Unlocked Bootloader** (Will trip Knox)
+- Snapdragon Variant
 - Minimum 30GB free storage
 - WSL Required
 
@@ -94,9 +95,10 @@ declare -A SYSTEM_PROPS=(
     ["ro.sf.lcd_density"]="420"
 )
 📊 Supported Devices
-Device Code	Model	Status
-x1q	SM-G981B	Primary
-y2q	SM-G986B	Experimental
+Device 	Model	Status
+x1q		Primary
+y2q		Experimental
+z3q     Experimental
 💬 Support
 For issues and questions:
 
