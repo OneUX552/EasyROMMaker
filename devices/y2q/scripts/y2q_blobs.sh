@@ -16,7 +16,7 @@ fi
 # Set paths
 TARGET_SYSTEM="${ROM_FOLDER}/system/system"
 TARGET_XML="${TARGET_SYSTEM}/etc/floating_feature.xml"
-SCRIPT_DIR="${BASE_DIR}/devices/x1q/scripts/"
+SCRIPT_DIR="${BASE_DIR}/devices/y2q/scripts/"
 
 # Verify target XML exists
 if [ ! -f "$TARGET_XML" ]; then
