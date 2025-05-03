@@ -1,58 +1,58 @@
 #!/bin/bash
-# buildprop_helper.sh - Advanced Build.prop Manager
 
-# Check if ROM_FOLDER is set
-[ -z "$ROM_FOLDER" ] && { echo "ERROR: ROM_FOLDER not set!"; exit 1; }
+# buildprop_helper.sh
 
-BUILD_PROP="$ROM_FOLDER/system/system/build.prop"
-BACKUP_PROP="$BUILD_PROP.bak"
-ISHIHARA_HEADER="# from variable ISHIHARA_ROM_BUILD_CONFIG_PROPERTIES"
-ISHIHARA_FOOTER="####################################"
+# Modified to support declarative syntax
+modify_build_props() {
+    local partition="$1"
+    declare -n properties="$2"
+    
+    local prop_file
+    case $partition in
+        "system")
+            prop_file="${ROM_FOLDER}/system/system/build.prop"
+            ;;
+        "vendor")
+            prop_file="${ROM_FOLDER}/vendor/build.prop"
+            ;;
+        "product")
+            prop_file="${ROM_FOLDER}/product/build.prop"
+            ;;
+        "odm")
+            prop_file="${ROM_FOLDER}/odm/build.prop"
+            ;;
+        "system_ext")
+            prop_file="${ROM_FOLDER}/system/system/system_ext/build.prop"
+            [ ! -f "$prop_file" ] && prop_file="${ROM_FOLDER}/system_ext/build.prop"
+            ;;
+        *)
+            echo "Invalid partition: $partition"
+            return 1
+            ;;
+    esac
 
-# Main processing function
-process_build_props() {
-    local SUBSCRIPT_SOURCE_DIR="$1"
-    local EDITS_FILE="$SUBSCRIPT_SOURCE_DIR/system/etc/build_edits.prop"
+    mkdir -p "$(dirname "$prop_file")"
+    [ ! -f "$prop_file" ] && touch "$prop_file"
 
-    [ -f "$EDITS_FILE" ] || return 0
-    [ -f "$BUILD_PROP" ] || { echo "ERROR: build.prop missing"; return 1; }
+    for key in "${!properties[@]}"; do
+        value="${properties[$key]}"
+        
+        # Remove surrounding quotes if present
+        value="${value%\"}"
+        value="${value#\"}"
+        value="${value%\'}"
+        value="${value#\'}"
 
-    # Create backup
-    cp -f "$BUILD_PROP" "$BACKUP_PROP"
-
-    # Process each property
-    while IFS= read -r line; do
-        [[ "$line" =~ ^[[:space:]]*# ]] && continue
-        [ -z "$line" ] && continue
-
-        if [[ "$line" =~ ^([a-zA-Z0-9._-]+)=(.*)$ ]]; then
-            local prop="${BASH_REMATCH[1]}"
-            local new_value="${BASH_REMATCH[2]}"
-
-            # Update existing property
-            if grep -q "^$prop=" "$BUILD_PROP"; then
-                local current_value=$(grep "^$prop=" "$BUILD_PROP" | cut -d= -f2-)
-                if [ "$current_value" != "$new_value" ]; then
-                    sed -i "s/^$prop=.*/$prop=$new_value/" "$BUILD_PROP"
-                    echo "Updated: $prop=$new_value"
-                fi
-            # Add new property to ISHIHARA section
-            else
-                # Create ISHIHARA section if missing
-                if ! grep -q "$ISHIHARA_HEADER" "$BUILD_PROP"; then
-                    sed -i "/^# end of file/i $ISHIHARA_HEADER\n$ISHIHARA_FOOTER" "$BUILD_PROP"
-                fi
-                
-                # Add property under ISHIHARA section
-                if ! grep -q "^$prop=" "$BUILD_PROP"; then
-                    sed -i "/$ISHIHARA_HEADER/a $prop=$new_value" "$BUILD_PROP"
-                    echo "Added: $prop=$new_value"
-                fi
+        # Check if property exists
+        if grep -q "^[[:space:]]*${key}=" "$prop_file"; then
+            current_val=$(grep "^[[:space:]]*${key}=" "$prop_file" | cut -d= -f2-)
+            if [ "$current_val" != "$value" ]; then
+                sed -i "s/^[[:space:]]*${key}=.*/$key=$value/" "$prop_file"
+                echo "Updated: $partition:$key=$value"
             fi
+        else
+            echo "$key=$value" >> "$prop_file"
+            echo "Added: $partition:$key=$value"
         fi
-    done < <(grep -v '^[[:space:]]*$' "$EDITS_FILE")
-
-    # Cleanup empty lines in ISHIHARA section
-    sed -i "/$ISHIHARA_HEADER/{N;/\n$/d}" "$BUILD_PROP"
-    sed -i "/$ISHIHARA_HEADER/,/$ISHIHARA_FOOTER/{/^$/d}" "$BUILD_PROP"
+    done
 }
