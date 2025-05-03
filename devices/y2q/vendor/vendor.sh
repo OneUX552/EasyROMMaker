@@ -11,7 +11,7 @@ PARTITIONS_DIR="${PARTITIONS_DIR:-${WORK_DIR}/partitions}"
 VENDOR_DIR="${BASE_DIR}/firmware/vendor/${DEVICE_CODE}"
 
 # Single URL for this specific device
-VENDOR_URL="https://example.com/x1q_vendor.img"  # REPLACE WITH y2q vendor.img stock
+VENDOR_URL="https://get.filesto.space/download/gAAAAABoFcGNSathTbO9Pvyyn0TxpksmtVmVwqUi6C0noE61HDTberIzwVIVvP8oDe3i790jgWZ8oplg9LG0w_FUqO3R4gk23Nwx57qFSk--gjWCnR9sMiY=" 
 
 # Create directories
 mkdir -p "$VENDOR_DIR" "$PARTITIONS_DIR"
