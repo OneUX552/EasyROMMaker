@@ -28,7 +28,7 @@ BUILD_PROP_PATHS["system_ext"]="${ROM_FOLDER}/system_ext/build.prop"
 
 # Build.prop properties
 declare -A SYSTEM_PROPS=(
-    ["ro.product.system.model"]="S938B"
+    ["ro.product.system.model"]="G986N"
     ["ro.factory.model"]="G986N"
 	["ro.product.system.name"]="e3qxxx"
     
@@ -43,18 +43,18 @@ declare -A VENDOR_PROPS=(
 )
 
 declare -A PRODUCT_PROPS=(
- ["ro.product.product.model"]="S938B"
+ ["ro.product.product.model"]="G986N"
  ["ro.product.product.name"]="e3qxxx"
 
 )
 
 declare -A ODM_PROPS=(
- ["ro.product.odm.model"]="S938B"
+ ["ro.product.odm.model"]="G986N"
  ["ro.product.odm.name"]="e3qxxx"
 )
 
 declare -A SYSTEM_EXT_PROPS=(
- ["ro.product.system_ext.model"]="S938B"
+ ["ro.product.system_ext.model"]="G986N"
  ["ro.product.system_ext.name"]="e3qxxx"
 )
 
