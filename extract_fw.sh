@@ -1,98 +1,235 @@
 #!/bin/bash
 set -e
 
-# Get base directory from first argument
-BASE_DIR="$1"
+# Configuration
+export BASE_DIR="$(pwd)"
 
-# Define paths relative to base directory
-WORK_DIR="${BASE_DIR}/firmware/work_dir"
-PARTITIONS_DIR="${WORK_DIR}/partitions"
-FIRMWARE_DIR="${BASE_DIR}/firmware"
 
-# Ensure necessary folders exist
-mkdir -p "$PARTITIONS_DIR"
+SCRIPTS_DIR="${BASE_DIR}/ishihara/scripts"
 
-echo "Working directory: $WORK_DIR"
+UTILS_DIR="${BASE_DIR}/ishihara/utils"
 
-check_required_images() {
-    if [ -f "$PARTITIONS_DIR/system.img" ] && 
-       [ -f "$PARTITIONS_DIR/odm.img" ] && 
-       [ -f "$PARTITIONS_DIR/product.img" ]; then
-        return 0
+FIRMWARE_DIR="${BASE_DIR}/firmware/"
+
+DEVICES_DIR="${BASE_DIR}/devices"
+
+INSTALL_SCRIPT="${BASE_DIR}/make/install.sh"
+
+PARTITIONS_DIR="${BASE_DIR}/firmware/work_dir/partitions"
+
+# Device List
+declare -A DEVICES=(
+    ["1"]="(x1q) S20 5G"
+    ["2"]="(y2q) S20+ 5G"
+    ["3"]="(z3q) S20 Ultra"
+    ["4"]="(c1q) Note20 5G"
+    ["5"]="(c2q) Note20 Ultra"
+)
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Error handling
+trap 'echo -e "${RED}Script interrupted! Exiting...${NC}"; exit 1' INT
+
+# Device Selection Function
+select_device() {
+    echo -e "${YELLOW}[+] Available Devices:${NC}"
+    for key in "${!DEVICES[@]}"; do
+        echo "  $key) ${DEVICES[$key]}"
+    done
+
+    while true; do
+        read -p "Select device [1-5]: " choice
+        if [[ -n "${DEVICES[$choice]}" ]]; then
+            # Extract device code between parentheses
+            DEVICE_CODE=$(echo "${DEVICES[$choice]}" | grep -oP '(?<=\().*(?=\))')
+            DEVICE_NAME=$(echo "${DEVICES[$choice]}" | sed 's/(.*)//' | xargs)
+            echo -e "${GREEN}[+] Selected: ${DEVICE_NAME} (${DEVICE_CODE})${NC}"
+            break
+        else
+            echo -e "${RED}[-] Invalid selection! Please try again.${NC}"
+        fi
+    done
+
+    export DEVICE_CODE DEVICE_NAME
+}
+
+
+   
+
+
+
+create_rom_kitchen_zip() {
+    local timestamp=$(date +"%Y-%m-%d_%H-%M")
+    local zip_name="${DEVICE_CODE}_${timestamp}.zip"
+    local zip_dir="${BASE_DIR}/input_rom_kitchen"
+    local img_count
+
+    echo -e "${YELLOW}[+] Preparing ROM kitchen package...${NC}"
+
+    # Verify IMG files exist
+    img_count=$(find "${PARTITIONS_DIR}" -maxdepth 1 -name "*.img" | wc -l)
+    if [ "$img_count" -eq 0 ]; then
+        echo -e "${RED}[-] Error: No .img files found in ${PARTITIONS_DIR}${NC}"
+        return 1
+    fi
+
+    # Create target directory
+    mkdir -p "${zip_dir}" || {
+        echo -e "${RED}[-] Failed to create output directory${NC}"
+        return 1
+    }
+
+    # Create ZIP with no compression
+    echo -e "${GREEN}[+] Creating ZIP archive (Store mode - no compression)...${NC}"
+    if ! (cd "${PARTITIONS_DIR}" && zip -0 -r "${zip_dir}/${zip_name}" ./*.img); then
+        echo -e "${RED}[-] ZIP creation failed${NC}"
+        rm -f "${zip_dir}/${zip_name}" 2>/dev/null
+        return 1
+    fi
+
+    # Verify final ZIP
+    if [ -f "${zip_dir}/${zip_name}" ]; then
+        echo -e "${GREEN}[✓] ROM kitchen package created: ${zip_dir}/${zip_name}${NC}"
     else
+        echo -e "${RED}[-] Unknown error in ZIP creation${NC}"
         return 1
     fi
 }
 
-extract_ap_file() {
-    echo "- Searching for AP image in ${FIRMWARE_DIR}..."
-    AP_FILE=$(find "${FIRMWARE_DIR}" -type f \( -iname "AP*.tar.md5" -o -iname "AP*.tar" -o -iname "AP*.zip" -o -iname "AP*.7z" \) | head -n 1)
+# --------------------------------------------------
+# Initial Setup
+# --------------------------------------------------
+clear
+echo -e "${YELLOW}
 
-    if [ -z "$AP_FILE" ]; then
-        echo "ERROR: No AP file found in ${FIRMWARE_DIR}"
-        exit 1
-    fi
+████████████████████████████████████████████████████████████████████████████████████
+█▄─▄█─▄▄▄▄█─█─█▄─▄█─█─██▀▄─██▄─▄▄▀██▀▄─████▄─▄▄▀█─▄▄─█▄─▀█▀─▄███▀▄▄▀█▀▄▄▀█░▄▄▄█─▄▄─█
+██─██▄▄▄▄─█─▄─██─██─▄─██─▀─███─▄─▄██─▀─█████─▄─▄█─██─██─█▄█─████▀▄▄▀██▀▄██▄▄▄▒█─██─█
+▀▄▄▄▀▄▄▄▄▄▀▄▀▄▀▄▄▄▀▄▀▄▀▄▄▀▄▄▀▄▄▀▄▄▀▄▄▀▄▄▀▀▀▄▄▀▄▄▀▄▄▄▄▀▄▄▄▀▄▄▄▀▀▀█▄▄█▀▄▄▄▄▀▄▄▄▄▀▄▄▄▄▀
 
-    echo "Extracting AP file: $AP_FILE..."
-    mkdir -p "$WORK_DIR"
-    
-    if [[ "$AP_FILE" == *.tar.md5 || "$AP_FILE" == *.tar ]]; then
-        tar -xf "$AP_FILE" -C "$WORK_DIR"
-    elif [[ "$AP_FILE" == *.zip ]]; then
-        unzip -q "$AP_FILE" -d "$WORK_DIR"
+
+Firmware Downloader and Extractor for target device 
+
+
+${NC}"
+
+DEPENDENCIES=("simg2img" "lpunpack" "openjdk-17-jdk" "xmlstarlet" "zip" "nodejs" "lz4" "make")
+MISSING_COUNT=0
+
+echo "[+] Checking system-wide dependencies..."
+
+# Check each dependency
+for dep in "${DEPENDENCIES[@]}"; do
+    if command -v "$dep" >/dev/null 2>&1 || dpkg -l | grep -qw "$dep"; then
+        echo "[+] $dep is installed."
     else
-        echo "ERROR: Unsupported file format: $AP_FILE"
-        exit 1
+        echo "[-] $dep is missing."
+        MISSING_COUNT=$((MISSING_COUNT + 1))
     fi
-}
+done
 
-process_super_image() {
-    echo "- Processing super.img.lz4..."
-    SUPER_IMG_LZ4=$(find "$WORK_DIR" -type f -name "super.img.lz4" | head -n 1)
-    
-    if [ -z "$SUPER_IMG_LZ4" ]; then
-        echo "ERROR: super.img.lz4 not found in extracted files."
-        exit 1
-    fi
 
-    echo "Decompressing super.img.lz4..."
-    lz4 -d "$SUPER_IMG_LZ4" "$WORK_DIR/super.img"
-
-    echo "Converting super.img (sparse) to raw image..."
-    simg2img "$WORK_DIR/super.img" "$WORK_DIR/super_raw.img"
-    
-    if [ $? -eq 0 ]; then
-        echo "Conversion successful. Deleting super.img..."
-        rm -f "$WORK_DIR/super.img"
+if [ "$MISSING_COUNT" -gt 0 ]; then
+    echo "[+] $MISSING_COUNT dependencies missing. Running install script..."
+    if [ -f "$INSTALL_SCRIPT" ]; then
+        bash "$INSTALL_SCRIPT" || {
+            echo "[-] Install script failed! Please resolve dependency issues manually."
+            exit 1
+        }
     else
-        echo "Error converting super.img to raw image. Exiting..."
+        echo "[-] install.sh not found! Please provide the installation script."
         exit 1
     fi
-
-    echo "Unpacking super_raw.img into partitions..."
-    rm -rf "$PARTITIONS_DIR"
-    mkdir -p "$PARTITIONS_DIR"
-    
-    lpunpack --slot=0 "$WORK_DIR/super_raw.img" "$PARTITIONS_DIR"
-    
-    if [ $? -eq 0 ]; then
-        echo "Unpacking successful. Cleaning up..."
-        rm -f "$PARTITIONS_DIR/vendor.img"
-        rm -f "$WORK_DIR/super_raw.img"
-        rm -f "$SUPER_IMG_LZ4"
-    else
-        echo "Error unpacking super_raw.img. Exiting..."
-        exit 1
-    fi
-}
-
-# Main execution flow
-if check_required_images; then
-    echo "[+] Required images found in $PARTITIONS_DIR. Skipping extraction steps."
 else
-    echo "[-] Required images missing. Running extraction..."
-    extract_ap_file
-    process_super_image
+    echo "[+] All dependencies are already installed. Skipping installation."
 fi
 
-echo "All partitions processed. Check $EXTRACTED_DIR for results."
+
+vendor_props() {
+    local vendor_script_path="${DEVICES_DIR}/${DEVICE_CODE}/vendor/vendor.sh"
+    
+    echo -e "${YELLOW}[+] Checking vendor operations for ${DEVICE_NAME}...${NC}"
+    
+    if [ -f "${vendor_script_path}" ]; then
+        echo -e "${GREEN}[+] Found vendor script at ${vendor_script_path}${NC}"
+        chmod +x "${vendor_script_path}"
+        
+        # Execute with proper arguments
+        if ! bash "${vendor_script_path}" "${BASE_DIR}" "${DEVICE_CODE}"; then
+            echo -e "${RED}[-] Vendor script execution failed!${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}[✓] Vendor operations completed${NC}"
+    else
+        echo -e "${YELLOW}[!] No vendor script found for ${DEVICE_CODE}, skipping...${NC}"
+    fi
+}
+
+check_firmware() {
+    echo -e "${YELLOW}[+] Checking firmware files...${NC}"
+    
+    # Search recursively in firmware directory and subdirectories
+    AP_FILES=$(find "${FIRMWARE_DIR}" -type f \( -name "AP_*.tar.md5" -o -name "AP_*.tar" \))
+    
+    if [ -n "$AP_FILES" ]; then
+        echo -e "${GREEN}[+] Found firmware files:${NC}"
+        echo "$AP_FILES" | sed 's/^/  /'
+        return 0
+    else
+        echo -e "${RED}[-] No AP files found in ${FIRMWARE_DIR}${NC}"
+        return 1
+    fi
+}
+
+
+
+
+# --------------------------------------------------
+# Firmware Download
+# --------------------------------------------------
+download_firmware() {
+    echo -e "${YELLOW}[+] Starting firmware download...${NC}"
+    bash "${UTILS_DIR}/samfirm.sh" || {
+        echo -e "${RED}[-] Firmware download failed!${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}[+] Firmware download completed${NC}"
+}
+
+# --------------------------------------------------
+# Firmware Extraction
+# --------------------------------------------------
+extract_firmware() {
+    echo -e "${YELLOW}[+] Extracting firmware...${NC}"
+    sudo bash "${UTILS_DIR}/extract_fw.sh" "${BASE_DIR}" || {
+        echo -e "${RED}[-] Extraction failed!${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}[+] Firmware extracted successfully${NC}"
+}
+
+# --------------------------------------------------
+# Main Flow
+# --------------------------------------------------
+# Check or download firmware
+if ! check_firmware; then
+    download_firmware
+fi
+
+if ! check_partitions; then
+extract_firmware
+fi
+
+select_device
+
+vendor_props
+
+create_rom_kitchen_zip
+
+
+echo -e "${GREEN}[+] Initial setup completed successfully!${NC}"
