@@ -1,0 +1,22 @@
+From d7221e9e53ac110061609ef041c136db9d4de0e9 Mon Sep 17 00:00:00 2001
+From: Ishihara0xn <166594898+SameerAlSahab@users.noreply.github.com>
+Date: Sat, 3 May 2025 14:15:36 +0600
+Subject: [PATCH] Brightness fix up on x1q,y2q and z3q
+
+---
+ .../com/android/server/power/PowerManagerUtil.smali             | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali b/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali
+index 8041b03..ebcc7f2 100644
+--- a/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali
++++ b/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali
+@@ -335,7 +335,7 @@
+     :goto_7
+     sput-boolean v11, Lcom/android/server/power/PowerManagerUtil;->EUREKA_PROJECT:Z
+ 
+-    const-string v12, "5"
++    const-string v12, "4"
+ 
+     invoke-static {v12}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+ 
