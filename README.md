@@ -12,7 +12,7 @@
 ## ⚠️ Requirements
 - **Unlocked Bootloader** (Will trip Knox)
 - Snapdragon Variant
-- Minimum 30GB free storage
+- Minimum 50GB free storage
 - WSL Required
 
 ## 🛠️ Build Instructions
@@ -27,7 +27,6 @@ Edit conf.txt with your parameters:
 
 # Device Configuration
 SOURCE_MODEL=SM-G98xB # Source firmware model
-TARGET_MODEL=SM-G981B # Your device model
 REGION=XXA # Firmware region
 IMEI= # Leave blank for auto-selection
 
@@ -42,7 +41,7 @@ Download required firmware
 
 Extract components
 
-Generate ported vendor files
+Generate kona vendor files
 
 Create input_rom_Kitchen.zip
 
@@ -53,17 +52,16 @@ Start a new project
 
 5. Build Execution
 bash
-bash devices/x1q.sh # For S20 (x1q)
+bash devices/x1q.sh # For S20 (x1q) same for other devices....
 Follow the on-screen prompts to select your CRB project.
 
 6. Final Packaging
 After successful build:
 
-Create system/vendor/product images
+Build system/vendor/product images 
 
 Package into flashable ZIP
 
-Sign the package (recommended)
 
 📁 File Structure
 Ishihara0xn-ROM/
@@ -75,7 +73,7 @@ Ishihara0xn-ROM/
 ├── input_rom_Kitchen/   # Auto-generated
 ├── conf.txt             # Main configuration
 └── extract_fw.sh        # Firmware processor
-🌟 Feature Customization
+Feature Customization
 Modify these files for advanced tuning:
 
 Floating Features
@@ -95,7 +93,7 @@ declare -A SYSTEM_PROPS=(
     ["ro.sf.lcd_density"]="420"
 )
 📊 Supported Devices
-Device 	Model	Status
+Device 	Status
 x1q		Primary
 y2q		Experimental
 z3q     Experimental
@@ -104,7 +102,7 @@ For issues and questions:
 
 Telegram Group
 
-XDA Thread: [Coming Soon]
+XDA Thread
 
 📜 License
 GPL-3.0 License. See LICENSE for details.
