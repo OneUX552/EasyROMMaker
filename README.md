@@ -63,7 +63,7 @@ Build system/vendor/product images
 Package into flashable ZIP
 
 
-📁 File Structure
+📁 Project Structure
 Ishihara0xn-ROM/
 ├── devices/              # Device-specific scripts
 │   └── x1q.sh           # S20 build script
@@ -104,5 +104,4 @@ Telegram Group
 
 XDA Thread
 
-📜 License
-GPL-3.0 License. See LICENSE for details.
+
