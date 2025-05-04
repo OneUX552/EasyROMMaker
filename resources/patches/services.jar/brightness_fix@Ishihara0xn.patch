@@ -7,10 +7,10 @@ Subject: [PATCH] Create brightnessfixup patch UI7 for 865
  .../com/android/server/power/PowerManagerUtil.smali             | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/services.jar/smali_classes2/com/android/server/power/PowerManagerUtil.smali b/services.jar/smali_classes2/com/android/server/power/PowerManagerUtil.smali
+diff --git a/smali_classes2/com/android/server/power/PowerManagerUtil.smali b/services.jar/smali_classes2/com/android/server/power/PowerManagerUtil.smali
 index a226589..2769651 100644
---- a/services.jar/smali_classes2/com/android/server/power/PowerManagerUtil.smali
-+++ b/services.jar/smali_classes2/com/android/server/power/PowerManagerUtil.smali
+--- a/smali_classes2/com/android/server/power/PowerManagerUtil.smali
++++ b/smali_classes2/com/android/server/power/PowerManagerUtil.smali
 @@ -321,7 +321,7 @@
      move v0, v3
  
