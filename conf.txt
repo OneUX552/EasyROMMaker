@@ -1,7 +1,7 @@
 # SOURCE FIRMWARE
 _______________________
-MODEL="SM-G998U1"
-REGION="ATT"
+MODEL="SM-G998U"
+REGION="CCT"
 IMEI="354433592036409"
 
 __________________________
