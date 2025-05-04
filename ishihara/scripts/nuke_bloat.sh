@@ -125,7 +125,7 @@ declare -a BLOAT_LIST=(
  "system/system/priv-app/UnifiedTetheringProvision"
  "system/system/priv-app/UnifiedVVM"
  "system/system/priv-app/PhotoEditor_Full"
- "system/system/priv-app/AirReadingGlass'
+ "system/system/priv-app/AirReadingGlass"
 
 
   "product/app/AssistantShell"
