@@ -1,5 +1,5 @@
 #!/bin/bash
-# framework_patcher.sh - Fixed Path Handling Version
+# framework_patcher.sh 
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -70,14 +70,14 @@ main() {
         }
 
     # =================================================================
-    # ANDROID 14 WORKAROUND - ADD AFTER DECOMPILATION
+    # ANDROID 15 WORKAROUND - ADD AFTER DECOMPILATION
     # =================================================================
     echo -e "${GREEN}[+] Checking for Android 14 resources...${NC}"
     if unzip -l "$ROM_FRAMEWORK" | grep -q "debian.mime.types"; then
-        echo -e "${YELLOW}[*] Found Android 14 resources, extracting...${NC}"
+        echo -e "${YELLOW}[*] Found Android 15 resources, extracting...${NC}"
         mkdir -p "$WORK_DIR/unknown"
         unzip -q "$ROM_FRAMEWORK" "res/*" -d "$WORK_DIR/unknown" || {
-            echo -e "${RED}ERROR: Failed to extract Android 14 resources${NC}"
+            echo -e "${RED}ERROR: Failed to extract Android 15 resources${NC}"
             cleanup
             exit 1
         }
@@ -106,14 +106,14 @@ main() {
         }
 
     # =================================================================
-    # ANDROID 14 WORKAROUND - ADD BEFORE REPLACING ORIGINAL
+    # ANDROID 15 WORKAROUND - ADD BEFORE REPLACING ORIGINAL
     # =================================================================
     if [ -d "$WORK_DIR/unknown" ]; then
-        echo -e "${GREEN}[+] Reintegrating Android 14 resources...${NC}"
+        echo -e "${GREEN}[+] Reintegrating Android 15 resources...${NC}"
         (
             cd "$WORK_DIR/unknown"
             zip -qr "$WORK_DIR/dist/framework.jar" . || {
-                echo -e "${RED}ERROR: Failed to add Android 14 resources${NC}"
+                echo -e "${RED}ERROR: Failed to add Android 15 resources${NC}"
                 cleanup
                 exit 1
             }
