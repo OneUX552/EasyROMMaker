@@ -1,10 +1,9 @@
 #!/bin/bash
 # framework_patcher.sh 
 
-# Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Path Configuration (relative to project root)
+# Paths
 PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"  # Two levels up from scripts/
 APKTOOL_JAR="$PROJECT_ROOT/external/apktool/apktool.jar"
 PATCHES_DIR="$PROJECT_ROOT/resources/patches/framework.jar"
@@ -72,7 +71,7 @@ main() {
     # =================================================================
     # ANDROID 15 WORKAROUND - ADD AFTER DECOMPILATION
     # =================================================================
-    echo -e "${GREEN}[+] Checking for Android 14 resources...${NC}"
+    echo -e "${GREEN}[+] Checking for Android 15 resources...${NC}"
     if unzip -l "$ROM_FRAMEWORK" | grep -q "debian.mime.types"; then
         echo -e "${YELLOW}[*] Found Android 15 resources, extracting...${NC}"
         mkdir -p "$WORK_DIR/unknown"
