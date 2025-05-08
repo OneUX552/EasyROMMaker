@@ -7,4 +7,4 @@ IMEI="354433592036409"
 __________________________
 #ROM KITCHENS PATH (Path to ur rom kitchen you are using!)
 
-CRB_KITCHEN_PATH="/mnt/c/Users/Sameer Al Sahab/Desktop/CRB Kitchen"
+CRB_KITCHEN_PATH="/mnt/c/Users/CRB Kitchen" ##Example for wsl paths
