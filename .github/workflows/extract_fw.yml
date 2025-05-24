@@ -1,0 +1,75 @@
+name: Samsung Firmware Processor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  process-firmware:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-17-jdk xmlstarlet zip lz4 make libz-dev
+        cd $GITHUB_WORKSPACE/make && chmod +x install.sh && ./install.sh
+        
+    - name: Download firmware
+      run: |
+        mkdir -p firmware
+        bash $GITHUB_WORKSPACE/ishihara/utils/samfirm.sh
+        
+    - name: Extract firmware
+      run: |
+        mkdir -p firmware/work_dir/partitions
+        bash $GITHUB_WORKSPACE/ishihara/utils/extract_fw.sh $GITHUB_WORKSPACE
+        
+    - name: Verify extracted partitions
+      run: |
+        if [ ! -f "$GITHUB_WORKSPACE/firmware/work_dir/partitions/system.img" ]; then
+          echo "::error::System partition not found!"
+          exit 1
+        fi
+        ls -lh $GITHUB_WORKSPACE/firmware/work_dir/partitions/
+        
+    - name: Upload system partition as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: system-partition
+        path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/system.img
+        retention-days: 1
+        
+    - name: Upload odm partition as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: odm-partition
+        path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/odm.img
+        retention-days: 1
+      if: contains('${{ steps.extract.outputs.partitions }}', 'odm.img')
+        
+    - name: Upload product partition as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: product-partition
+        path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/product.img
+        retention-days: 1
+      if: contains('${{ steps.extract.outputs.partitions }}', 'product.img')
+        
+    - name: Upload vendor partition as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vendor-partition
+        path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/vendor.img
+        retention-days: 1
+      if: contains('${{ steps.extract.outputs.partitions }}', 'vendor.img')
