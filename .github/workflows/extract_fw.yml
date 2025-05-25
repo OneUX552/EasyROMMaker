@@ -8,7 +8,7 @@ on:
 jobs:
   process-firmware:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120  # Increased timeout for large firmware processing
     
     steps:
     - name: Checkout repository
@@ -26,14 +26,18 @@ jobs:
         cd $GITHUB_WORKSPACE/make && chmod +x install.sh && ./install.sh
         
     - name: Download firmware
+      id: download
       run: |
         mkdir -p firmware
         bash $GITHUB_WORKSPACE/ishihara/utils/samfirm.sh
         
     - name: Extract firmware
+      id: extract
       run: |
         mkdir -p firmware/work_dir/partitions
         bash $GITHUB_WORKSPACE/ishihara/utils/extract_fw.sh $GITHUB_WORKSPACE
+        # Set output variables for partitions
+        echo "partitions=$(ls $GITHUB_WORKSPACE/firmware/work_dir/partitions/ | tr '\n' ' ')" >> $GITHUB_OUTPUT
         
     - name: Verify extracted partitions
       run: |
@@ -41,35 +45,36 @@ jobs:
           echo "::error::System partition not found!"
           exit 1
         fi
+        echo "Available partitions:"
         ls -lh $GITHUB_WORKSPACE/firmware/work_dir/partitions/
         
     - name: Upload system partition as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: system-partition
         path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/system.img
         retention-days: 1
         
     - name: Upload odm partition as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odm-partition
         path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/odm.img
         retention-days: 1
-      if: contains('${{ steps.extract.outputs.partitions }}', 'odm.img')
+      if: contains(steps.extract.outputs.partitions, 'odm.img')
         
     - name: Upload product partition as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: product-partition
         path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/product.img
         retention-days: 1
-      if: contains('${{ steps.extract.outputs.partitions }}', 'product.img')
+      if: contains(steps.extract.outputs.partitions, 'product.img')
         
     - name: Upload vendor partition as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: vendor-partition
         path: $GITHUB_WORKSPACE/firmware/work_dir/partitions/vendor.img
         retention-days: 1
-      if: contains('${{ steps.extract.outputs.partitions }}', 'vendor.img')
+      if: contains(steps.extract.outputs.partitions, 'vendor.img')
