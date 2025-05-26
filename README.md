@@ -1,6 +1,6 @@
 # Ishihara0xn-ROM v6.1.1
 
-![IshiharaROM Banner](https://i.imgur.com/placeholder.png)  
+![IshiharaROM Banner](https://get.filesto.space/download/gAAAAABoNIPAz_fEEVRMgrAOMamj3L2M8VGWfm-exTooFJg0Rn8xh330L-t3V5s_m9NUZqVPL4Vz-Ad-4n6UuxMkrlpI9fXBKhQLckm8KuAwBzH2PvuG_AHmvfvL8upl53LxbBDiA3cX)  
 *A full Samsung firmware port for Galaxy S20/S20+/Ultra and Note20 series with enhanced features and customization*
 
 ## 📌 Key Features
