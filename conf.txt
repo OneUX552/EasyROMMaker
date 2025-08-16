@@ -3,7 +3,7 @@ _______________________
 MODEL="SCG20"
 REGION="KDI"
 IMEI="351559420912214"
-##do not block it i js found this imei on facebkok
+##do not block it i js found this imei on facebook
 __________________________
 #ROM KITCHENS PATH (Path to ur rom kitchen you are using!)
 
