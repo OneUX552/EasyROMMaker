@@ -53,7 +53,7 @@ fi
 
 
 download_res() {
-    local URL="https://get.filesto.space/download/gAAAAABoFKLvlxKH4X-KFhzcOHgHol29SVqvi7_DbMrWnDFNMMTLEawA17ZAYyI9wQntAiGUQOm1OlOPIFnACMMR1BlDkNIgSsm-xBgNRVya2N7fc-5iOAMYQEQuTkHbW3HkE3o7X05w"
+    local URL="https://my.filesto.space/download/gAAAAABoFKLvlxKH4X-KFhzcOHgHol29SVqvi7_DbMrWnDFNMMTLEawA17ZAYyI9wQntAiGUQOm1OlOPIFnACMMR1BlDkNIgSsm-xBgNRVya2N7fc-5iOAMYQEQuTkHbW3HkE3o7X05w"
     local FILE_NAME="resources.7z"
     local DEST_DIR="resources/"
     local MIN_SIZE_MB=300

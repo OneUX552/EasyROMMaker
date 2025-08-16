@@ -1,10 +1,10 @@
 # SOURCE FIRMWARE
 _______________________
-MODEL="SM-G998U"
-REGION="CCT"
-IMEI="354433592036409"
-
+MODEL="SCG20"
+REGION="KDI"
+IMEI="351559420912214"
+##do not block it i js found this imei on facebook
 __________________________
 #ROM KITCHENS PATH (Path to ur rom kitchen you are using!)
 
-CRB_KITCHEN_PATH="/mnt/c/Users/CRB Kitchen" ##Example for wsl paths
+CRB_KITCHEN_PATH="/mnt/c/Users/Admin/Desktop/crb" ##Example for wsl paths
