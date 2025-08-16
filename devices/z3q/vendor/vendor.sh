@@ -12,7 +12,7 @@ PARTITIONS_DIR="${PARTITIONS_DIR:-${WORK_DIR}/partitions}"
 VENDOR_DIR="${BASE_DIR}/firmware/vendor/${DEVICE_CODE}"
 
 # Single URL for this specific device
-VENDOR_URL="https://get.filesto.space/download/gAAAAABoDjyJ7goLo4j8hR5QOfjmjibCeIHme4FkFpeWcW1N2InUYIXlP4898g5qLS1YZhASn3hSeAe50kfSWOTql8dNdUps3cg8T2P728OBjr1ykZ6bDNQ="  # REPLACE WITH z3q vendor.img stock
+VENDOR_URL="https://my.filesto.space/download/gAAAAABoDjyJ7goLo4j8hR5QOfjmjibCeIHme4FkFpeWcW1N2InUYIXlP4898g5qLS1YZhASn3hSeAe50kfSWOTql8dNdUps3cg8T2P728OBjr1ykZ6bDNQ="  # REPLACE WITH z3q vendor.img stock
 
 # Create directories
 mkdir -p "$VENDOR_DIR" "$PARTITIONS_DIR"
