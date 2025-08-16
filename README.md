@@ -18,4 +18,8 @@
 Edit conf.txt with your parameters:
 MODEL , REGION , IMEI , KITCHEN_PATH etc
 
+## Future features
+0 model patch
+N20 series support - n20u might be a bit more delayed due to its differences
+
 
